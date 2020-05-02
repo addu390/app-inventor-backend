@@ -84,11 +84,11 @@ WSGI_APPLICATION = 'appBuilder.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'app-builder',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'NAME': 'app-builder-313331a3e5',
+        'USER': 'app-builder-313331a3e5',
+        'PASSWORD': 'nmcvt759e8',
+        'HOST': 'mysql.stackcp.com',
+        'PORT': '55164',
     }
 }
 
