@@ -27,3 +27,15 @@ class ApplicationTransformers:
             component_json.pop("request")
             components.append(component_json)
         return components
+
+    @staticmethod
+    def user_response_serializer(data):
+        return {
+            "userId": data.get("user_id"),
+            "displayName": data.get("display_name"),
+            "imageUrl": data.get("image_url"),
+            "refreshToken": data.get("refresh_token"),
+            "email": data.get("email"),
+            "accessToken": data.get("access_token"),
+            "idToken": data.get("id_token"),
+        }

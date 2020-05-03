@@ -32,7 +32,6 @@ def is_valid_user(user_id, access_token, validate):
     is_valid = False
     user = get_object_or_404(User, user_id=user_id)
     data = UserSerializer(user).data
-    print(data.get(ACCESS_TOKEN), access_token)
     if data.get(ACCESS_TOKEN) == access_token:
         response = requests.get(API_ENDPOINT_V3 + "?access_token=" + data.get(ACCESS_TOKEN))
         if response.status_code == 200 and (int(response.json().get(EXPIRES_IN)) or validate) > 0:

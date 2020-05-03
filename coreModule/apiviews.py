@@ -30,6 +30,7 @@ class ComponentDetail(APIView):
         Update existing Component
         Note that the entire component has to be in the request,
         as this is a replacement of request object.
+        @return Success/ Error object.
         """
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
@@ -48,6 +49,10 @@ class ComponentDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, user_id, app_id, component_id):
+        """
+        TODO : Support soft deletes to support "UNDO" from the application.
+        (Similar to GMAIL undo option after sending a message)
+        """
         component = get_object_or_404(Component, component_id=component_id, app_id=app_id)
         component.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -56,13 +61,19 @@ class ComponentDetail(APIView):
 class ApplicationDetail(APIView):
     """
     Each user can have several Applications (One to many)
-    Each Application can have several Components, hence return a LIST of flattened json of Components.
+    Each Application can have several Components.
     """
     def get(self, request, user_id, app_id):
+        """
+        From user_id (Auth token is validated) and app_id
+        @return a LIST of flattened json of Components.
+        """
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
+
         application_object = get_object_or_404(Application, app_id=app_id, user_id=user_id)
         application = ApplicationResourceSerializer(application_object).data
+
         components_object = Component.objects.filter(app_id=app_id)
         components = ApplicationTransformers.component_request_transformer(components_object)
 
@@ -76,13 +87,16 @@ class ApplicationDetail(APIView):
         """
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
+
         application = {
             "user_id": user_id,
             "app_id": app_id,
             "name": request.data.get("name"),
             "description": request.data.get("description")
         }
+
         if app_id is None or app_id == "NULL":
+            # If the path param app_id is not present, CREATE new Application.
             application["app_id"] = uuid.uuid4().__str__()
             serializer = ApplicationResourceSerializer(data=application)
         else:
@@ -98,6 +112,7 @@ class ApplicationDetail(APIView):
     def put(self, request, user_id, app_id):
         """
         Component CREATION, return the unique identifier of the component.
+        COMPONENT details are stored as a BLOB in "request" column.
         TODO: Validate to move it to component detail
         """
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
@@ -120,6 +135,7 @@ class ApplicationDetail(APIView):
     def delete(self, request, user_id, app_id):
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
+
         application = get_object_or_404(Application, app_id=app_id,
                                         user_id=user_id)
         application.delete()
@@ -134,6 +150,8 @@ class UserDetail(APIView):
     def post(self, request, user_id):
         user = get_or_none(User, user_id=user_id)
         data = UserSerializer(user).data
+
+        # Move to a services/helper if required.
         user_data = {
             "user_id": request.data.get("userId"),
             "display_name": request.data.get("displayName"),
@@ -156,33 +174,23 @@ class UserDetail(APIView):
 
         if serializer.is_valid():
             serializer.save()
-            serializer_data = {
-                "userId": serializer.data.get("user_id"),
-                "displayName": serializer.data.get("display_name"),
-                "imageUrl": serializer.data.get("image_url"),
-                "refreshToken": serializer.data.get("refresh_token"),
-                "email": serializer.data.get("email"),
-                "accessToken": serializer.data.get("access_token"),
-                "idToken": serializer.data.get("id_token"),
-            }
+            serializer_data = ApplicationTransformers.user_response_serializer(serializer.data)
             return Response(serializer_data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, user_id):
+        """
+        Validate AUTH token and get user details
+        displayName and imageUrl is powered by USER GET API and not local storage.
+        """
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
+
         user = get_object_or_404(User, user_id=user_id)
+
         data = UserSerializer(user).data
-        serializer_data = {
-            "userId": data.get("user_id"),
-            "displayName": data.get("display_name"),
-            "imageUrl": data.get("image_url"),
-            "refreshToken": data.get("refresh_token"),
-            "email": data.get("email"),
-            "accessToken": data.get("access_token"),
-            "idToken": data.get("id_token"),
-        }
+        serializer_data = ApplicationTransformers.user_response_serializer(data)
 
         return Response(serializer_data)
 
@@ -192,8 +200,9 @@ class ApplicationList(generics.ListAPIView):
 
     def get_queryset(self):
         """
-        This view should return a list of all the purchases
-        for the currently authenticated user.
+        This view should return a list of all the APPLICATION
+        for the currently authenticated user (USER_ID).
+        TODO : Validate if deactivating/ activating of APPLICATION needs to be supported.
         """
         user_id = self.kwargs[USER_ID]
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
