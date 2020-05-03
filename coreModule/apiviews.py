@@ -202,7 +202,7 @@ class ApplicationList(generics.ListAPIView):
         """
         This view should return a list of all the APPLICATION
         for the currently authenticated user (USER_ID).
-        TODO : Validate if deactivating/ activating of APPLICATION needs to be supported.
+        TODO : Validate if deactivating/ activating of APPLICATION needs to be supported
         """
         user_id = self.kwargs[USER_ID]
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
