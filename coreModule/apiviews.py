@@ -113,7 +113,6 @@ class ApplicationDetail(APIView):
         """
         Component CREATION, return the unique identifier of the component.
         COMPONENT details are stored as a BLOB in "request" column.
-        TODO: Validate to move it to component detail
         """
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
