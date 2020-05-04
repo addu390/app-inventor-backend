@@ -19,7 +19,7 @@ class ComponentDetail(APIView):
     Request column of the component is flattened in the Response of GET response and reverted in PUT.
     """
     def get(self, request, user_id, app_id, component_id):
-        if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
+        if not is_valid_user(user_id, self.request.query_params.get(AUTH), True):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
         component = get_object_or_404(Component, component_id=component_id, app_id=app_id)
         components = ApplicationTransformers.component_request_transformer([component])
@@ -32,7 +32,7 @@ class ComponentDetail(APIView):
         as this is a replacement of request object.
         @return Success/ Error object.
         """
-        if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
+        if not is_valid_user(user_id, self.request.query_params.get(AUTH), True):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
         component_object = get_object_or_404(Component, component_id=component_id, app_id=app_id)
         component = {
@@ -68,7 +68,7 @@ class ApplicationDetail(APIView):
         From user_id (Auth token is validated) and app_id
         @return a LIST of flattened json of Components.
         """
-        if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
+        if not is_valid_user(user_id, self.request.query_params.get(AUTH), True):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
 
         application_object = get_object_or_404(Application, app_id=app_id, user_id=user_id)
@@ -85,7 +85,7 @@ class ApplicationDetail(APIView):
         Create or Update an Application
         If app_id is None - CREATION
         """
-        if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
+        if not is_valid_user(user_id, self.request.query_params.get(AUTH), True):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
 
         application = {
@@ -114,7 +114,7 @@ class ApplicationDetail(APIView):
         Component CREATION, return the unique identifier of the component.
         COMPONENT details are stored as a BLOB in "request" column.
         """
-        if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
+        if not is_valid_user(user_id, self.request.query_params.get(AUTH), True):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
         application = get_object_or_404(Application, app_id=app_id,
                                         user_id=user_id)
@@ -132,7 +132,7 @@ class ApplicationDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, user_id, app_id):
-        if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
+        if not is_valid_user(user_id, self.request.query_params.get(AUTH), True):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
 
         application = get_object_or_404(Application, app_id=app_id,
@@ -204,14 +204,14 @@ class ApplicationList(generics.ListAPIView):
         TODO : Validate if deactivating/ activating of APPLICATION needs to be supported
         """
         user_id = self.kwargs[USER_ID]
-        if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
+        if not is_valid_user(user_id, self.request.query_params.get(AUTH), True):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
         return Application.objects.filter(user_id=user_id)
 
 
 class GoogleOAuth(APIView):
     def post(self, request, user_id):
-        if not is_valid_user(user_id, self.request.query_params.get(AUTH), True):
+        if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
         response = token_refresh(user_id)
         if response.status_code == 200:

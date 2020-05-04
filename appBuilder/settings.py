@@ -82,6 +82,8 @@ WSGI_APPLICATION = 'appBuilder.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+CLIENT_ID = config('CLIENT_ID')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
