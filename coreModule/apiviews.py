@@ -181,7 +181,7 @@ class UserDetail(APIView):
     def get(self, request, user_id):
         """
         Validate AUTH token and get user details
-        displayName and imageUrl is powered by USER GET API and not local storage.
+        displayName and imageUrl is powered by USER GET API and not local storage
         """
         if not is_valid_user(user_id, self.request.query_params.get(AUTH), False):
             return Response(INVALID_TOKEN, status=status.HTTP_400_BAD_REQUEST)
