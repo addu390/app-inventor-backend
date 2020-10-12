@@ -1,0 +1,6 @@
+DB_NAME=app-builder
+DB_USER=root
+DB_PASSWORD=
+DB_HOST=127.0.0.1
+DB_PORT=3306
+CLIENT_ID=999999999-xxx-xxxx-xxx-xxx.apps.googleusercontent.com
