@@ -19,12 +19,16 @@ class MySQL(object):
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
 
+        query_type = self.query.strip()[0].lower()
         try:
             with connection.cursor() as cursor:
                 # Execute the query - Allow only select queries?
                 cursor.execute(self.query)
-                result = cursor.fetchone()
-                print(result)
+                if query_type == "s":
+                    result = cursor.fetchone()
+                    print(result)
+                elif query_type == "c" or query_type == "u":
+                    connection.commit()
 
         finally:
             connection.close()
