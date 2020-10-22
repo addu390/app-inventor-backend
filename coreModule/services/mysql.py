@@ -19,6 +19,7 @@ class MySQL(object):
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
 
+        # TODO: Yet to test!
         query_type = self.query.strip()[0].lower()
         try:
             with connection.cursor() as cursor:
