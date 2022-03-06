@@ -1,4 +1,7 @@
-**App Inventor** - Django 3 project (Work in progress),
+# App Inventor - Backend
+
+⚠️ Deprecated 
+
 Previously called as **app-builder-backend**
 
 Installation on local machine :
