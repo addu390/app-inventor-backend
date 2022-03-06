@@ -1,8 +1,8 @@
 # App Inventor - Backend
 
-⚠️ Deprecated 
+⛔️ Deprecated
 
-Previously called as **app-builder-backend**
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
 Installation on local machine :
 - Install `python 3.7.6`.
